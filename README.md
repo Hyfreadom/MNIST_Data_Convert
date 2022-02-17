@@ -1,0 +1,2 @@
+# MNIST_Data_Convert
+把mnist官方数据集中的数据转化为jpg格式，和实际情况更加契合，方便学习
