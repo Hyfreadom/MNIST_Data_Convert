@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 import struct
-def save_mnist_to_jpg(dataset_path, output_path): 
+def save_mnist_to_jpg(dataset_path, output_path,label_path): 
     files = os.listdir(dataset_path)
     print(files)
     #make image_file path
@@ -13,22 +13,27 @@ def save_mnist_to_jpg(dataset_path, output_path):
     prefix = 'test'
     #read in binary
     with open(mnist_image_file, 'rb') as f1: 
-        head_file=f1.read(16)# head_inf, read by the following function
-        magic_number, num_file, rows, cols = struct.unpack('>IIII',imgpath.read(16))
-        size = rows*cols
+        #head_file=f1.read(16)# head_inf, read by the following function
+        magic_number, num_file, height, width = struct.unpack('>IIII',f1.read(16))
+        size = height*width
         image_file = f1.read()
     with open(mnist_label_file, 'rb') as f2:
         magic_number,num_file = struct.unpack('>II',f2.read(8))       
         print(num_file)
         label_file = f2.read()
+    img_label=open(label_path+'-label','w+')
     for i in range(num_file):
         label = label_file[i]
         image_list = [item for item in image_file[i * size:i * size + size]]
         image_np = np.array(image_list, dtype=np.uint8).reshape(height, width)
         save_name = os.path.join(save_dir, '{}_{}_{}.jpg'.format(prefix, i, label))
         cv2.imwrite(save_name, image_np)
+
+        label_name=save_name+"   "+str(label)+'\n'
+        img_label.write(label_name)
+    img_label.close()
     print("=" * 20, "preprocess data finished", "=" * 20)
  
 if __name__ == '__main__':
-    save_mnist_to_jpg('./data/MNIST/test/','./data/MNIST/test_picture/')
-    save_mnist_to_jpg('./data/MNIST/train/','./data/MNIST/train_picture/')
+    save_mnist_to_jpg('./data/MNIST/test/','./data/MNIST/test_picture/','./test')
+    save_mnist_to_jpg('./data/MNIST/train/','./data/MNIST/train_picture/','./train')
